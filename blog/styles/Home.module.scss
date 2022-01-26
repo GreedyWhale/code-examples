@@ -1,0 +1,18 @@
+.container {
+  padding: 0 2rem;
+}
+
+.main {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  section {
+    border: thick double #32a1ce;
+    padding: 1em;
+  }
+  .inputWrap {
+    margin-bottom: 20px;
+    > input {
+      margin-left: 1em;
+    }
+  }
+}

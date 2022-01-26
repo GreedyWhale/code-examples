@@ -11,6 +11,9 @@ datasource db {
 }
 
 model User {
-  id   Int    @id              @default(autoincrement())
-  name String @db.VarChar(255) @unique
+  id             Int      @default(autoincrement())  @id
+  username       String   @db.VarChar(255)           @unique
+  passwordDigest String   @db.Text
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
 }
