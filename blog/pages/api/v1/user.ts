@@ -3,41 +3,64 @@
  * @Author: MADAO
  * @Date: 2022-01-26 14:41:08
  * @LastEditors: MADAO
- * @LastEditTime: 2022-01-26 17:57:08
+ * @LastEditTime: 2022-02-14 22:47:01
  */
 import type { NextApiHandler } from 'next';
+import type { User } from '@prisma/client';
+import type { ResponseData } from '~/types/api';
 
 import UserController from '~/controller/user';
-import { formatResponse, checkRequestMethods, endRequest } from '~/utils/middlewares';
+import { checkRequestMethods, endRequest, formatResponse, setCookie } from '~/utils/middlewares';
+import { withSessionRoute } from '~/utils/withSession';
+import { SESSION_USER_ID } from '~/utils/constant';
 
 const userController = new UserController();
 
 const user: NextApiHandler = async (req, res) => {
-  await checkRequestMethods(req, res, ['POST']);
+  await checkRequestMethods(req, res, ['POST', 'GET', 'DELETE']);
   const { username, password } = req.body;
 
-  // 检查用户提交数据
-  const testResult = UserController.validator(username, password);
-  if (!testResult.passed) {
-    endRequest(res, formatResponse(422, {}, testResult.message));
-    return;
-  }
+  try {
+    if (req.method === 'POST') {
+      const user = await userController.signUp(username, password);
+      return endRequest(res, user);
+    }
 
-  // 检测用户是否已经存在
-  const user = await userController.getUser({ username });
-  if (user.status === 'fulfilled' && user.value) {
-    endRequest(res, formatResponse(422, {}, '用户已存在，请直接登录'));
-    return;
-  }
+    if (req.method === 'GET') {
+      const id = req.session[SESSION_USER_ID];
+      const { username, password } = req.query;
+      let user: ResponseData<User | {}> | null = null;
 
-  // 创建新用户
-  const newUser = await userController.createUser(username, password);
-  if (newUser.status === 'rejected') {
-    endRequest(res, formatResponse(500, newUser.reason, newUser.reason.message || '创建用户失败，请稍后重试！'));
-    return;
-  }
+      if (username && password) {
+        user = await userController.signIn({ username: username as string }, password as string);
+      } else if (id) {
+        user = await userController.signIn({ id });
+      }
 
-  endRequest(res, formatResponse(200, newUser.value, '创建成功！'));
+      if (user) {
+        if (user.code === 200) {
+          await setCookie(req, (user.data as User).id);
+        } else {
+          req.session.destroy();
+        }
+
+        endRequest(res, user);
+        return;
+      }
+
+      req.session.destroy();
+      endRequest(res, formatResponse(401, {}, '用户身份验证失败'));
+      return;
+    }
+
+    if (req.method === 'DELETE') {
+      req.session.destroy();
+      endRequest(res, formatResponse(204, {}, '退出成功'));
+      return;
+    }
+  } catch (error: any) {
+    return endRequest(res, error);
+  }
 };
 
-export default user;
+export default withSessionRoute(user);

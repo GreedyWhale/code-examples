@@ -4,9 +4,11 @@ import type { NextPage } from 'next';
 import React from 'react';
 import axios from 'axios';
 
+import { withSessionSsr } from '~/utils/withSession';
+import { SESSION_USER_ID } from '~/utils/constant';
 import styles from '~/styles/Home.module.scss';
 
-const Home: NextPage = () => {
+const Home: NextPage<{ userId: number; }> = props => {
   const [username, setUsername] = React.useState('');
   const [password, setPassword] = React.useState('');
 
@@ -21,6 +23,15 @@ const Home: NextPage = () => {
         console.log('error', error);
       });
   };
+
+  const handleSignIn = (type: 'cookie' | 'userInfo') => {
+    console.log(props.userId);
+    const params = type === 'cookie' ? {} : { username: 'user', password: '123456' };
+    axios.get('/api/v1/user', { params })
+      .then(() => alert('登录成功'));
+  };
+
+  const handleSignOut = () => axios.delete('/api/v1/user').then(() => alert('登出成功'));
 
   return (
     <div className={styles.container}>
@@ -50,9 +61,24 @@ const Home: NextPage = () => {
 
           <button onClick={handleSignUp}>提交</button>
         </section>
+
+        <section>
+          <button onClick={() => handleSignIn('userInfo')}>使用用户名/密码登录</button>
+          <button onClick={() => handleSignIn('cookie')}>使用cookie登录</button>
+        </section>
+
+        <section>
+          <button onClick={handleSignOut}>登出</button>
+        </section>
       </main>
     </div>
   );
 };
 
 export default Home;
+
+export const getServerSideProps = withSessionSsr(async context => ({
+  props: {
+    userId: context.req.session[SESSION_USER_ID] || -1,
+  },
+}));

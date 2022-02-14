@@ -3,10 +3,12 @@
  * @Author: MADAO
  * @Date: 2022-01-26 17:19:02
  * @LastEditors: MADAO
- * @LastEditTime: 2022-01-26 17:54:11
+ * @LastEditTime: 2022-02-14 22:32:59
  */
 import type { NextApiRequest, NextApiResponse } from 'next';
 import type { ResponseData, ResponseStatusCode, ResponseMessageMap } from '~/types/api';
+
+import { SESSION_USER_ID } from '~/utils/constant';
 
 const messages: ResponseMessageMap = {
   200: '请求成功',
@@ -46,4 +48,9 @@ export const checkRequestMethods = async (req: NextApiRequest, res: NextApiRespo
   const data = formatResponse(405);
   endRequest(res, data, { Allow: allowedMethods.join(',') });
   return Promise.reject(new Error('请求方法不允许'));
+};
+
+export const setCookie = async (req: NextApiRequest, value: any) => {
+  req.session[SESSION_USER_ID] = value;
+  await req.session.save();
 };
