@@ -11,6 +11,21 @@ import styles from '~/styles/Home.module.scss';
 const Home: NextPage<{ userId: number; }> = props => {
   const [username, setUsername] = React.useState('');
   const [password, setPassword] = React.useState('');
+  const [post, setPost] = React.useState({
+    title: '',
+    introduction: '',
+    content: '',
+  });
+  const [postDetail, setPostDetail] = React.useState({
+    title: '',
+    introduction: '',
+    content: '',
+    author: {
+      id: -1,
+      username: '',
+    },
+  });
+  const [postId, setPostId] = React.useState(-1);
 
   const handleSignUp = () => {
     axios.post('/api/v1/user', { username, password })
@@ -32,6 +47,28 @@ const Home: NextPage<{ userId: number; }> = props => {
   };
 
   const handleSignOut = () => axios.delete('/api/v1/user').then(() => alert('登出成功'));
+
+  const handleSubmit = (id?: number) => {
+    if (id) {
+      axios.put(`/api/v1/posts/${id}`, { postData: post })
+        .then(response => console.log(response));
+
+      return;
+    }
+
+    axios.post('/api/v1/posts', { postData: post })
+      .then(response => console.log(response));
+  };
+
+  const handleUpdatePosts = () => {
+    axios.get(`/api/v1/posts/${postId}`)
+      .then(response => setPostDetail(response.data.data));
+  };
+
+  const handleDeletePost = () => {
+    axios.delete(`/api/v1/posts/${postId}`)
+      .then(response => setPostDetail(response.data.data));
+  };
 
   return (
     <div className={styles.container}>
@@ -69,6 +106,43 @@ const Home: NextPage<{ userId: number; }> = props => {
 
         <section>
           <button onClick={handleSignOut}>登出</button>
+        </section>
+
+        <section>
+          <h1>创建文章</h1>
+          <input type="text" placeholder="请输入博客标题" onChange={event => setPost(prev => ({ ...prev, title: event.target.value }))} />
+          <input type="text" placeholder="请输入博客简介" onChange={event => setPost(prev => ({ ...prev, introduction: event.target.value }))} />
+          <textarea placeholder="请输入博客内容" onChange={event => setPost(prev => ({ ...prev, content: event.target.value }))}></textarea>
+          <br />
+          <button onClick={() => handleSubmit()}>提交</button>
+        </section>
+
+        <section>
+          <h1>获取文章详情</h1>
+          <div>
+            <h3>{postDetail.title}</h3>
+            {/* <p>{postDetail.author.username}</p> */}
+            <p>{postDetail.introduction}</p>
+            <p>{postDetail.content}</p>
+          </div>
+          <br />
+          <input type="number" placeholder="请输入博客id" onChange={event => setPostId(parseInt(event.target.value, 10))} />
+          <button onClick={handleUpdatePosts}>获取文章</button>
+        </section>
+
+        <section>
+          <h1>更新文章</h1>
+          <input type="text" placeholder="请输入博客标题" onChange={event => setPost(prev => ({ ...prev, title: event.target.value }))} />
+          <input type="text" placeholder="请输入博客简介" onChange={event => setPost(prev => ({ ...prev, introduction: event.target.value }))} />
+          <textarea placeholder="请输入博客内容" onChange={event => setPost(prev => ({ ...prev, content: event.target.value }))}></textarea>
+          <br />
+          <button onClick={() => handleSubmit(4)}>提交</button>
+        </section>
+
+        <section>
+          <h1>删除文章</h1>
+          <input type="number" placeholder="请输入博客id" onChange={event => setPostId(parseInt(event.target.value, 10))} />
+          <button onClick={handleDeletePost}>提交</button>
         </section>
       </main>
     </div>

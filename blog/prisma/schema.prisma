@@ -16,4 +16,16 @@ model User {
   passwordDigest String   @db.Text
   createdAt      DateTime @default(now())
   updatedAt      DateTime @updatedAt
+  posts          Post[]
+}
+
+model Post {
+  id           Int             @id              @default(autoincrement())
+  title        String          @db.VarChar(512)
+  content      String          @db.Text
+  introduction String          @db.Text
+  author       User            @relation(fields: [authorId], references: [id])
+  authorId     Int
+  createdAt    DateTime        @default(now())
+  updatedAt    DateTime        @updatedAt
 }
