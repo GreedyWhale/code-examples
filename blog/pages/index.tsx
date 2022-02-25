@@ -26,6 +26,7 @@ const Home: NextPage<{ userId: number; }> = props => {
     },
   });
   const [postId, setPostId] = React.useState(-1);
+  const [file, setFile] = React.useState<FileList | null>(null);
 
   const handleSignUp = () => {
     axios.post('/api/v1/user', { username, password })
@@ -68,6 +69,14 @@ const Home: NextPage<{ userId: number; }> = props => {
   const handleDeletePost = () => {
     axios.delete(`/api/v1/posts/${postId}`)
       .then(response => setPostDetail(response.data.data));
+  };
+
+  const handleUpdate = () => {
+    if (file) {
+      const data = new FormData();
+      data.append('file', file[0]);
+      axios.post('/api/v1/upload', data);
+    }
   };
 
   return (
@@ -143,6 +152,12 @@ const Home: NextPage<{ userId: number; }> = props => {
           <h1>删除文章</h1>
           <input type="number" placeholder="请输入博客id" onChange={event => setPostId(parseInt(event.target.value, 10))} />
           <button onClick={handleDeletePost}>提交</button>
+        </section>
+
+        <section>
+          <h1>上传文件</h1>
+          <input type="file" accept="images/*" onChange={event => setFile(event.target.files)} />
+          <button onClick={handleUpdate}>上传</button>
         </section>
       </main>
     </div>
