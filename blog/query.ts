@@ -3,7 +3,7 @@
  * @Author: MADAO
  * @Date: 2022-01-20 16:26:22
  * @LastEditors: MADAO
- * @LastEditTime: 2022-01-20 16:36:04
+ * @LastEditTime: 2022-02-28 16:37:35
  */
 
 import { PrismaClient } from '@prisma/client';
@@ -13,7 +13,8 @@ const prisma = new PrismaClient();
 async function main() {
   await prisma.user.create({
     data: {
-      name: 'Allen',
+      username: 'Allen',
+      passwordDigest: 'test',
     },
   });
 

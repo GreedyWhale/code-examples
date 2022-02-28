@@ -3,7 +3,7 @@
  * @Author: MADAO
  * @Date: 2022-02-24 14:28:37
  * @LastEditors: MADAO
- * @LastEditTime: 2022-02-24 17:01:59
+ * @LastEditTime: 2022-02-28 11:33:40
  */
 import type { NextApiHandler } from 'next';
 
@@ -24,6 +24,7 @@ const postDetailHandler:NextApiHandler = async (req, res) => {
     const detail = await postController.getDetail(parseInt(id as string, 10));
 
     endRequest(res, detail);
+    return;
   }
 
   if (typeof userId !== 'number') {
