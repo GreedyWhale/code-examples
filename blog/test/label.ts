@@ -3,7 +3,7 @@
  * @Author: MADAO
  * @Date: 2022-02-25 11:32:08
  * @LastEditors: MADAO
- * @LastEditTime: 2022-02-25 15:20:53
+ * @LastEditTime: 2022-03-08 11:56:42
  */
 import type { Post } from 'prisma/prisma-client';
 
@@ -27,19 +27,19 @@ const data: PostParams = {
   introduction: '用于测试label的创建、更新和删除',
   content: '用于测试label的创建、更新和删除',
   labels: [
-    { name: '标签三', action: 'add' },
-    { name: '标签四', action: 'add' },
+    { name: '标签三', action: 'unchanged' },
+    { name: '标签四', action: 'delete', id: 3 },
   ],
 };
 
 const handle = async () => {
   const { labels, ...rest } = data;
   await prisma.post.upsert({
-    where: { id: -1 },
+    where: { id: 1 },
     create: {
       ...rest,
       author: {
-        connect: { id: 5 },
+        connect: { id: 1 },
       },
       labels: {
         connectOrCreate: labels.filter(label => label.action === 'add').map(label => ({
@@ -51,7 +51,7 @@ const handle = async () => {
     update: {
       ...rest,
       author: {
-        connect: { id: 5 },
+        connect: { id: 1 },
       },
       labels: {
         connectOrCreate: labels.filter(label => label.action === 'add').map(label => ({
