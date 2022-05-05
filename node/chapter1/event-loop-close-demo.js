@@ -3,7 +3,7 @@
  * @Author: MADAO
  * @Date: 2022-03-29 15:54:42
  * @LastEditors: MADAO
- * @LastEditTime: 2022-03-29 17:34:20
+ * @LastEditTime: 2022-04-29 17:04:30
  */
 const net = require('net');
 
@@ -15,6 +15,7 @@ const server = net.createServer(socket => {
   socket.on('data', (data) => {
     console.log(`data: ${data}`);
     socket.destroy();
+    console.log('2222');
   });
 });
 
