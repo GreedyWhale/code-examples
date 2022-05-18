@@ -1,0 +1,26 @@
+{
+  "name": "todo-list",
+  "version": "1.0.0",
+  "main": "index.js",
+  "license": "MIT",
+  "scripts": {
+    "es:build": "node ./config/esbuild.js",
+    "ts:check": "tsc --p ./tsconfig.json",
+    "build": "yarn ts:check && yarn es:build"
+  },
+  "bin": {
+    "t": "./bin/cli.js"
+  },
+  "devDependencies": {
+    "@types/inquirer": "^8.2.1",
+    "esbuild": "^0.14.39",
+    "esbuild-node-externals": "^1.4.1",
+    "ts-node": "^10.7.0",
+    "typescript": "^4.6.4"
+  },
+  "dependencies": {
+    "commander": "^9.2.0",
+    "inquirer": "^8.2.4",
+    "ora": "^5.4.1"
+  }
+}
