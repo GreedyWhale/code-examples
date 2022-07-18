@@ -3,7 +3,7 @@
  * @Author: MADAO
  * @Date: 2022-05-16 15:13:59
  * @LastEditors: MADAO
- * @LastEditTime: 2022-05-16 16:33:28
+ * @LastEditTime: 2022-05-30 14:47:51
  */
 import { Duplex } from 'stream';
 
@@ -25,4 +25,4 @@ const duplex = new Duplex({
   }
 });
 
-duplex.pipe(process.stdout);
+duplex.pipe(duplex);
